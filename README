@@ -1,0 +1,34 @@
+This is a repository for a package that is a component of the GNV project
+for VMS.
+
+Its purpose is to provide a record of the source used for the GNV packaged
+version of the product.
+
+This repository is for the GNV fork of GNU make 3.78.1.
+
+We are in the process of merging this fork back into the upstream GNU make
+projects.  When that merge is complete, this repository will be frozen.
+
+Only simple bug fixes will be applied to this fork, which exists to allow
+building a PCSI kit of existing GNV make for used until the merge is done.
+
+The original unmodified GNV source is located in the reference/ directory and
+all additional VMS specific changes are located in the vms_source directory.
+
+A VMS concealed logical name of src_root: is for the reference directory and
+a VMS concealed logical name of vms_root: is set ot the vms_source directory.
+
+These are kept separate to make it easy to determine what VMS specific changes
+where made and to allow retargeting the src_root: to a different version to
+easily support maintaining multiple versions such as release, beta, and trunk
+at the same time.
+
+The user can then create a logical name of lcl_root: for the directory that
+will contain the build products.  The lcl_root: directory tree is the only
+directory tree that the build procedure should be modifying.
+
+A logcal name search list of prj_root: is set to lcl_root:,vms_root:,src_root:
+for building the package.
+
+Mercurial was chosen for the repository as there are clients that can run on
+VMS that is native to it.
