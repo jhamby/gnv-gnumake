@@ -348,3 +348,10 @@
 
 /* Some special prototypes */
 extern char *vmsify PARAMS ((char *name, int type));
+
+#include <builtins.h>
+#define alloca(__foo) __ALLOCA(__foo)
+#define __alloca(__foo) __ALLOCA(__foo)
+
+#pragma message disable questcompare
+

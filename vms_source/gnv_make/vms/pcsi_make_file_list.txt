@@ -1,0 +1,60 @@
+! File: pcsi_make_file_list.txt
+!
+! File list for building a PCSI kit.
+! Very simple format so that the parsing logic can be simple.
+! links first, directory second, and files third.
+!
+! link -> file tells procedure to create/remove a link on install/uninstall
+! If more than one link, consider using an alias file.
+!
+! [xxx.yyy]foo.dir is a directory file for the rename phase.
+! [xxx.yyy.foo] is a directory file for the create phase.
+! Each subdirectory needs to be on its own pair of lines.
+!
+! [xxx.yyy]file.ext is a file for the rename and add phases.
+!
+! 07-Jul-2014  J. Malmberg
+!
+!============================================================================
+![gnv.usr.bin]make. -> [gnv.usr.bin]gnv$make.exe
+![gnv.usr.bin]make.exe -> [gnv.usr.bin]gnv$make.exe
+[gnv]
+[000000]gnv.dir
+[gnv.bin]
+[gnv]bin.dir
+[gnv.vms_bin]
+[gnv]vms_bin.dir
+[gnv.usr]
+[gnv]usr.dir
+[gnv.usr.bin]
+[gnv.usr]bin.dir
+[gnv.usr]share.dir
+[gnv.usr.share]
+[gnv.usr.share]man.dir
+[gnv.usr.share.man]
+[gnv.usr.share.man]man1.dir
+[gnv.usr.share.man.man1]
+[gnv.usr.share]info.dir
+[gnv.usr.share.info]
+[gnv.usr.share.doc]make.dir
+[gnv.usr.share.doc.make]
+[gnv.usr.share.man.man1]make.1
+[gnv.usr.share.doc.make]AUTHORS.
+[gnv.usr.share.doc.make]COPYING.
+[gnv.usr.share.doc.make]NEWS.
+[gnv.usr.share.doc.make]README.
+![gnv.usr.share.doc.make]readme.vms
+[gnv.usr.share.info]make.info
+[gnv.usr.share.info]make.info-1
+[gnv.usr.share.info]make.info-2
+[gnv.usr.share.info]make.info-3
+[gnv.usr.share.info]make.info-4
+[gnv.usr.share.info]make.info-5
+[gnv.usr.share.info]make.info-6
+[gnv.usr.share.info]make.info-7
+[gnv.usr.share.info]make.info-8
+[gnv.usr.share.info]make.info-9
+[gnv.usr.share.info]make.info-10
+[gnv.usr.bin]gnv$make.exe
+[gnv.vms_bin]remove_old_make.com
+[gnv.vms_bin]make_alias_setup.com

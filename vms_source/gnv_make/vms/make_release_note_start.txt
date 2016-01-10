@@ -1,0 +1,232 @@
+From file: make_release_note_start.com
+
+This is the GNV 3.0.1 fork of GNU Make 3.78.1 with a minor bug-fix.
+
+Future work on GNV make is planned to be done by merging these changes
+with the GNU Make upstream so that one image can be used that will use
+Unix rules when running under a shell like Bash, and the traditional
+VMS rules when running under DCL.
+
+Only critical bugs that can not be easily worked around will probably be
+fixed in the GNV Make fork before the merge is complete with the upstream
+GNU Make.
+
+This kit is being released because the merging is taking longer than
+expected as a lot of fixes are needed for the GNU Make traditional VMS rules
+to stabilize that mode before attempting the merge.
+
+The main reason for this kit is that the GNV make is needed for building
+many of the GNV components from scratch, and this kit along with the
+new GNV Bash 4.3.42, Coretuils 8.24, Grep 2.22, Sed 4.2.2, Gawk 4.1.3,
+ar_tools 3.0.2, ld_tools 3.0.4, and Perl 5.2x, should allow building
+most utilities that use the common "configure" step and resulting generated
+makefile, with out having the older full GNV kits installed.
+
+Note: I am a hobbyist and am not providing any support or any commitment
+to supply bug fixes or future releases.  This code is as-is with no
+warrantees.
+
+The testing of this tool involved using it to build cPython 3.6
+pre-release.
+
+Special installation notes:
+
+*  VAX/VMS implementation is experimental and may not be complete.
+
+*  Please see https://sourceforge.net/p/gnv/wiki/InstallingGNVPackages/
+   for the latest information on installing GNV related PCSI kits.
+
+*  We are updating and replacing GNV one kit at a time and transitioning
+   GNV to be a set of kits that the GNV package will install.  During
+   this transition some extra issues will need to be handled during
+   installs and upgrades.
+
+*  Due to the way that PCSI identifies packages, if you install a package
+   from one producer and then want to upgrade it from another producer,
+   you will probably need to uninstall the previous package first.
+
+   Some of these packages were previously created with different producer
+   prefixes.  We are standardizing on VMSPORTS and GNV as the branding
+   prefixes.  GNV will be for packages that are part of the GNV product
+   suite, and VMSPORTS will be for most other packages.
+
+   This uninstall can cause warning messages about dependencies.  If you
+   are transitioning to an upwardly compatible package, you can ignore
+   those warnings.
+
+*  This package should be installed to the same volume as GNV is installed.
+
+   If you uninstall or upgrade GNV or install a GNV from before the
+   transition is complete, you will need to reinstall all other packages
+   that install to the same GNV directory tree.
+
+   This is because at least some of the existing GNV installation procedures
+   have bugs in them were instead of just deleting the files that were
+   installed, they delete all files in the GNV directory tree.
+
+*  Because this is a transition, this package is replacing files from the
+   old GNV packages.  This is a necessary issue to allow incremental
+   improvement as we can not replace the GNV package until we get all
+   the component packages done.
+
+*  The GNV 2.x through at least the 3.0.1 kits make an unusual change
+   to the disk directory structure where they are installed where
+   they use the [vms$common.gnv] as a mount point and mount the posix
+   root on it.  This is a bug because it causes many problems and does
+   not offer any advantages.  One of the problems is that it causes
+   problems with other PCSI installs and uninstalls to that directory.
+
+   This bug can be manually repaired such as has been done on
+   on encompasserve.org as documented in PORTING_TO_VMS notes conference.
+
+   At this time, we do not have a scripted repair to this bug, and it
+   may not be possible to fully script a repair because this bug can
+   cause the POSIX root and [vms$common.gnv] to have different contents
+   when they should be the same directory, and it will take a manual
+   inspection to select which files go where.
+
+*  Because of the directory change bug, the gnv$startup.com in the GNV
+   kit must be run when the system boots up or the [vms$common.gnv]
+   directory will appear to be empty.
+
+   If a PCSI kit like this one is installed when the GNV startup has not
+   been run, it will create a new directory tree under [vms$common.gnv]
+   that will not be visible to the posix root.  If you uninstall this
+   PCSI kit before running the gnv$startup.com procedure then you can
+   install it after running the gnv$startup.com procedure.  If you have
+   run the gnv$startup.com procedure after the install, then you have
+   a mess, and you will need to use the GNV umnt to un-mount the
+   [vms$common.gnv] directory before the uninstall of this kit will
+   work.
+
+An analyze/disk/repair step on the installation disk should be done after
+installation to collect files left over from incomplete deletions into the
+SYSLOST directory.  This step should be done on a "quiet" system per HP
+recomendations.
+
+Bugs can be logged at the tracker with https://sourceforge.net/projects/gnv/.
+There is no guarantee that bugs will be fixed for a hobbyist build.
+
+VMS specific port information:
+
+The logical name GNV$GNU is used to find the simulated posix root and defines
+the logical name SYS$POSIX_ROOT in the process table in user mode for child
+processes if needed.  This is to comply with VMS logical name conventions.
+The logical name BIN is also set in the process table in user mode to be
+GNV$GNU:[BIN] if it is not already set.
+
+The following DECC$Feature settings are in in effect for the MAKE image
+and the alias entries by default:
+
+DECC$ACL_ACCESS_CHECK enabled.
+DECC$ALLOW_REMOVE_OPEN_FILES enabled.
+DECC$ARGV_PARSE_STYLE enabled.
+DECC$EFS_CASE_PRESERVE enabled.
+DECC$EFS_CHARSET enabled.
+DECC$EFS_FILE_TIMESTAMPS enabled.
+DECC$ENABLE_GETENV_CACHE enabled.
+DECC$EXEC_FILEATTR_INHERITANCE set to 2.
+DECC$FILE_PERMISSION_UNIX enabled.
+DECC$FILE_SHARING enabled.
+DECC$FILE_OWNER_UNIX enabled.
+DECC$FILENAME_REPORT_UNIX enabled.
+DECC$FILENAME_UNIX_NO_VERSION enabled.
+DECC$GLOB_UNIX_STYLE enabled.
+DECC$POSIX_SEEK_STREAM_FILE enabled.
+DECC$READDIR_DROPDOTNOTYPE enabled.
+DECC$RENAME_NO_INHERIT enabled.
+DECC$STDIO_CTX_EOL enabled.
+DECC$STRTOL_ERANGE enabled.
+DECC$UNIX_PATH_BEFORE_LOGNAME enabled.
+
+While more strict UNIX compatibility feature settings can be applied by users
+by setting feature logical names, these settings are all the Bash and most
+ported programs need.
+
+These tools use the VMS CRTL to handle the Unix format pathnames and as
+such is dependent on them.  It is a known issue that directories with
+a Unix name "file.dir/" and some symbolic links are not handled correctly.
+This is a combination of problems with RMS and CRTL.  The RMS portion is
+fixed with the VMS84?_RMS-V0300 ECO kit.  I am not aware of a CRTL kit that
+fixes the issues.
+
+
+Usage Notes:
+
+This kit is designed to be used with the GNV Bash 4.2.47 or later kit.
+
+The GNV make program is designed to be installed in the GNV$GNU directory tree.
+
+Fixes and enhancements:
+
+** Version 3.78.1 - Initial Separate Kit
+
+*  Makefile.vms files are now ignored.  Makefile.vms files use a unique
+   syntax that is a merge of DCL and some Unix shell features that are
+   not understood by the GNV fork of make at all.
+   https://sourceforge.net/p/gnv/bugs/32/
+
+*  No logical names required for proper operations other than GNV$GNU
+   for locating the simulated "/".
+
+*  GNV$GNU is used to find the posix root and locally sets SYS$POSIX_ROOT
+   for child processes if needed.  This is to comply with VMS logical
+   name conventions.  The logical name BIN is also set locally to be
+   GNV$GNU:[BIN] if it is not already set.
+
+*  Previouse GNV kits had this tool named MAKE.EXE and then either copied
+   or hard link to be other image names.  This kit has the image named
+   GNV$MAKE.EXE and hard links to MAKE and MAKE.EXE.
+
+Issues not fixed:
+
+*  sys$login:make* files may be left behind.
+   https://sourceforge.net/p/gnv/bugs/31/
+
+*  This fork of GNU Make uses the vaxc$path logical name to find the images
+   to run for recipes.
+   If the logical name vaxc$path is not defined, it will be defined internally
+   with the list of:
+
+   GNV$GNU:[usr.local.bin]
+   GNV$GNU:[usr.local.sbin]
+   GNV$GNU:[usr.bin]
+   GNV$GNU:[bin]
+   GNV$GNU:[sbin]
+   SYS$DISK:[].
+
+   Future versions of GNU make are planned to use the PATH environment
+   variable inherited from Bash, when run from Bash.
+
+
+The supplied GNV$MAKE_STARTUP.COM procedure is provided in
+[VMS$COMMON.SYS$STARTUP] can be put in your VMS startup procedure to make
+sure that logical names and images are installed. It is recommended
+that the GNV$STARTUP.COM procedure be run first, followed by the
+GNV$BASH_STARTUP.COM procedure before the GNV$MAKE_STARTUP.COM is
+executed.
+
+The name of the make tool image have been prefixed with GNV$ to prevent
+possible naming conflicts with other programs that are on the system.  The
+GNV$ prefix has been registered with HP for this purpose.
+
+OpenVMS specific building and kitting instructions are in a section below.
+
+
+Currently, the focus of the OpenVMS GNV porting team is to address bugs in
+the OpenVMS port of GNV components that pose immediate barriers to running
+configure and make scripts for Open Source Software packages targeting
+OpenVMS environments.
+
+The GNV development team is involved in an ongoing effort to identify and
+document the underlying technical causes for these current limitations and (if
+available) workarounds as well as developing code fixes to eliminate them. The
+VMS-Ports Source Forge project at https://sourceforge.net/p/vms-ports/tickets/
+currently documents OpenVMS CRTL bugs and limitations with respect to porting
+Open Source Software using OpenVMS. The VMS-Ports Source Forge Project also
+contains examples of ported packages provided by volunteer contributors as well
+as documentation with recommendations on how to setup, modify and use the
+OpenVMS GNV environment for the purpose of porting Open Source software
+packages to OpenVMS. Browse to https://sourceforge.net/p/vms-ports/wiki/Home/
+for more information.
+

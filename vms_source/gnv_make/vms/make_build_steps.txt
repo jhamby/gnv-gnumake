@@ -1,0 +1,233 @@
+From File: make_build_steps.txt
+
+Building GNV_MAKE on OpenVMS for use with GNV requires a current HP C compiler.
+
+The GNV_Make product is a fork of the GNU Make project, that has been
+modified to work with GNV instead of with DCL.
+
+In the future, it is planned to merge the features of this fork into the
+GNU Make upstream project and abandon this fork.
+
+The HP C 7.x compilers were used for building on Alpha and Itanium.
+The Compaq C 6.4 compiler is being used on VAX.
+
+MMK was obtained from https://github.com/endlesssoftware/mmk
+
+Several special things were done in this fork of make to VMS to make it
+easier to keep it up to date with the Unix version.
+
+Note the GNV$ prefix is registered for the GNV project to prevent name
+collisions with other products and packages.  This is a VMS convention.
+
+The files are stored with GNV_ instead of GNV$ most open source source
+code maintainers do not want to files with $ in their source repositories.
+
+The build procedure will copy the files to have the GNV$ names as needed.
+
+1. The original GNV make source files are in their own directory tree which
+is never written to by the build process. See below about the how this is done
+with logical names.
+
+2. A file vms_eco_level.h is used to set the ECO of the package.  The
+vms_eco_level.h needs to be set back to zero if the version or patch level
+of the GNU Unix source is changed.  This file is currently only used
+by the kit building procedure.
+
+The source kits are provided in backup savesets inside of the PCSI install kit.
+
+Backup save sets are currently the only distribution medium that I can be
+sure is installed on a target VMS system that will correctly unpack files
+with extended character sets in them.  You may need to adjust the ownership
+of the restored files for kits on Alpha/Itanium VMS versions 8.1 and earlier.
+
+On VAX, the filenames will be as seen on the VAX system, typically with non
+ODS-2 characters and case changes prefixed with $ characters.
+
+[gnv.common_src]make_*_original_src.bck is the original source of the
+GNV make kit as provided by the GNV project.
+
+These backup savesets should be restored to different directory trees on
+an ODS-5 volume(s) which are referenced by concealed rooted logical names,
+unless on VAX, where either an NFS or ODS-2 volume can be used.
+
+SRC_ROOT: is for the source files common to all platforms.  This can be a
+          read only copy of the files from a change control repository.
+
+VMS_ROOT: is for the files that were changed from the repository copy of
+          SRC_ROOT:
+
+          Note, you should create the VMS_ROOT: directory tree even if it is
+          initially empty.  This is where you should put edits if you are
+          making changes.
+
+          In my build environment, the source_root:[gnu_vms.gnv_make] is a
+          directory with the checked out code and vms_root:[gnv_make] is
+          a copy with any local modifications.
+
+          The command procedure compare_make_source.com will report any
+          differences in the source_root:[gnv_make.vms_sources.gnv_make]
+          directory and the vms_root:[gnv_make] directory.  If the
+          source_root: logical is not defined, it will translate the
+          logical name src_root to do the effective of
+          src_root:[gnv_make.-.-.gnu_vms.gnv_make] to find the
+          VMS specific code HG checkout based on where the checkout for
+          the GNU source is expected to be.
+
+LCL_ROOT: is manually created to have the same base and sub-directories as
+          SRC_ROOT: and VMS_ROOT:  This is for the architecture specific
+          binaries and other files created during the build.
+
+The logical name REF_ROOT: is optionally defined to be a logical name that
+is a search list for VMS_ROOT:,SRC_ROOT:
+
+The logical name PRJ_ROOT: is defined to be a logical name that is a search
+list for LCL_ROOT:,REF_ROOT:
+
+The VMS_ROOT and LCL_ROOT directory trees can be created with commands
+similar to:
+
+  $ create/dir lcl_root:[gnv_make]/prot=w:re
+  $ copy src_root:[gnv_make...]*.dir -
+    lcl_root:[gnv_make...]/prot=(o:rwed,w:re)
+  $ create/dir vms_root:[gnv_make]/prot=w:re
+  $ copy src_root:[gnv_make...]*.dir -
+    vms_root:[gnv_make...]/prot=(o:rwed,w:re)
+
+One of the ways with to protect the source from being modified is to have
+the directories under src_root: owned by a user or resource where the build
+username only has read access to it.
+
+Edit the file gnv_make_release_note_start.txt or other text files to reflect
+any changes.
+
+Edit the file PCSI_GNV_MAKE_FILE_LIST.TXT if there are new files added to the
+kit.  These files should all be ODS-2 legal filenames and directories.
+
+Note that if src_root: or vms_root: are NFS mounted disks, the
+ step of backing up the source files will probably hang or fail.
+
+You need to copy the source files to VMS mounted disks and create
+logical names SRC_ROOT1 and VMS_ROOT1 to work around this to to
+reference local disks.  Make sure src_root1:[000000] and
+vms_root1:[000000] exist and can be written to.
+
+The command procedure compare_ld_source can be used to check
+those directories and keep them up to date.
+
+    @[.vms]compare_ld_source.com SRCBCK UPDATE
+
+    This compares the reference GNU source with the backup
+    staging directory for it and updates with any changes.
+
+    @[.vms]compare_ld_source.com VMSBCK UPDATE
+
+    This compares the VMS specific source with the backup
+    staging directory for it and updates with any changes.
+
+    Leave off "UPDATE" to just check without doing any changes.
+
+    If you are not using NFS mounted disks and do not want to have a
+    separate directory for staging the sources for backup make sure
+    that src_root1: and vms_root1: do not exist.
+
+
+The kits will be built in the directory STAGE_ROOT:[KIT], which must be
+writable to the build procedure.
+
+Define the logical name GNV_PCSI_PRODUCER to indicate who is making the
+distribution.
+
+Define the logical name GNV_PCSI_PRODUCER_FULL_NAME to be your full name
+or full name of your company.
+
+These two GNV_PCSI_* logical names need to be manually defined to indicate
+the "branding" to differentiate the source of the kit.
+
+A limitation of the PCSI kitting procedure is that when selecting files, it
+tends to ignore the directory structure and assumes that all files with the
+same name are the same file, so every file placed in the kit must have a
+unique ODS-2 legal name.  Then a procedure needs to be added to the kit to
+create an alias link on install and remove the link on remove.
+
+While newer versions of PCSI can support ODS-5 filenames, not all verions
+of PCSI on systems that have ODS-5 filenames do.  So as a post install step,
+the PCSI kit built by these steps does a rename to the correct case.
+
+While the kit building procedure tries to detect beta or test kit builds,
+by passing the P1 parameter as "BETA" it will force the kit to use "B" for
+the version prefix letter.  If the P2 parameter is also specified, the first
+letter of it will be used for the version prefix letter.
+
+With these search lists set up and the logical names described, GNV Make can
+be built and kitted by setting your default to PRJ_ROOT:[gnv_make]
+and then issuing the command:
+
+   $ @pcsi_product_make.com
+
+First it will build the binaries by using a DCL script.
+
+   $ @build_make.com
+
+This build_make.com script in future will also likely build a debug image.
+This extra image is not added to the resulting PCSI kit.
+
+To clean up after a build to start over, run the build procedure with the
+target realclean.
+
+   $ @build_make.com realclean
+
+Note that becauese the source as a file config.h that that is replaced by
+a newer version of config.h by the build procedure, the cleanup step will
+not delete any versions of config.h.
+
+The files are installed into a NEW_GNU directory for staging by running the
+procedure stage_make_install.com.  This copies the binaries and creates
+alias links to them.
+
+   $ @stage_make_install.com remove
+   $ @stage_make_install.com
+
+On the VAX platform, the staged files are needed for building the PCSI
+kit, as the VAX source was staged on an NFS volume, which encodes the
+filenames that have any upper case or special symbols in them.
+
+To remove the staged files, the procedure is run again with the parameter
+"REMOVE".  This makes sure that the alias links are removed.
+
+The names and contents of the PCSI files requires that the version of
+ld_tools be encoded in a special format.  This is done by:
+
+   @make_pcsi_make_kit_name.com
+
+The release notes are built from the release note start, readme files and
+this file:
+
+   @build_make_release_notes.com
+
+Then the backup the source kits.
+
+Building a PCSI kit for an architecture takes the following steps after
+making sure that you have a working build environment.
+
+On VAX, the product command always prompts to the terminal for a confirmation.
+
+If there is another kit for this same version of ld_tools, but for a different
+base platform or operating system version, the product command will prompt
+to the terminal to select which one to compress.
+
+       The following message is normal:
+          %PCSI-I-CANNOTVAL, cannot validate
+            EAGLE$DQA0:[stage_root.][kit]GNV-AXPVMS-MAKE-V--1.PCSI;1
+          -PCSI-I-NOTSIGNED, product kit is not signed and therefore has
+          no manifest file
+
+This will result in an uncompressed kits for the target platform by
+default.
+
+To run the self tests on the built image:
+
+   $ @stage_make_install.com remove
+   $ @stage_make_install.com
+   $ @test_make.com
+
+Good Luck.
