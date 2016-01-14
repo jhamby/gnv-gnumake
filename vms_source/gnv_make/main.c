@@ -2748,7 +2748,7 @@ print_version ()
     /* Do it only once.  */
     return;
 
-  printf ("%sGNU Make version %s", precede, version_string);
+  printf ("%sGNV Fork of GNU Make version %s", precede, version_string);
   if (remote_description != 0 && *remote_description != '\0')
     printf ("-%s", remote_description);
 
@@ -2759,7 +2759,7 @@ print_version ()
 %sThis is free software; see the source for copying conditions.\n\
 %sThere is NO warranty; not even for MERCHANTABILITY or FITNESS FOR A\n\
 %sPARTICULAR PURPOSE.\n\n\
-%sReport bugs to <bug-make@gnu.org>.\n\n"),
+%sReport bugs to https://sourceforge.net/p/gnv/bugs/\n\n"),
           precede, make_host,
 	  precede, precede, precede, precede, precede, precede);
 
