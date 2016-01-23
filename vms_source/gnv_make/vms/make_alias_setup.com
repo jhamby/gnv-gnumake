@@ -74,7 +74,7 @@ $ if p4 .eqs. "" then p4 = p2
 $ ftype = f$element(1, ".", p1)
 $ if ftype .eqs. "."
 $ then
-$   file = "gnv$gnu:''p2'''p1'.EXE"
+$   file = "gnv$gnu:''p2'gnv$''p1'.EXE"
 $   alias = "gnv$gnu:''p4'''p3'."
 $ else
 $   file = "gnv$gnu:''p2'''p1'"

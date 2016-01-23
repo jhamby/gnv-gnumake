@@ -409,11 +409,6 @@ $!
 $flst_loop_end:
 $ close flst
 $!
-$!   Add Link alias procedure file (N/A for make)
-$!-----------------------------------------------------
-$ write pdsc "   file ""[vms_bin]make_alias_setup.com"""
-$ write pdsc "     source [vms_bin]make_alias_setup.com ;"
-$!
 $!   Add [.SYS$STARTUP]gnv$make_startup file
 $!---------------------------------------
 $ write pdsc "   file ""[sys$startup]gnv$make_startup.com"""
