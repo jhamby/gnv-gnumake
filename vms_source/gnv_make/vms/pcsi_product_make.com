@@ -15,6 +15,8 @@ $! 01-Jan-2016  J.Malmberg
 $!
 $!=========================================================================
 $!
+$ project = "make"
+$!
 $! Save default
 $ default_dir = f$environment("DEFAULT")
 $!
@@ -52,7 +54,7 @@ $   goto all_exit
 $ endif
 $!
 $!
-$! Build the make image(s)
+$! Build the project image(s)
 $!-------------------------
 $ file1 = "gnv$make.exe"
 $ if f$search(file1) .eqs. ""
@@ -62,31 +64,48 @@ $ endif
 $!
 $! Stage the images for building the kit
 $!--------------------------------------
-$ @[.vms]stage_make_install.com remove
-$ @[.vms]stage_make_install.com
-$!
+$ @[.vms]stage_'project'_install.com remove
+$ @[.vms]stage_'project'_install.com
 $!
 $!
 $! Make sure that the kit name is up to date for this build
 $!----------------------------------------------------------
-$ @[.vms]make_pcsi_make_kit_name.com 'p1' 'p2'
+$ @[.vms]make_pcsi_'project'_kit_name.com 'p1' 'p2'
 $!
 $! Make sure that the release note file name is up to date
 $!---------------------------------------------------------
-$ @[.vms]build_make_release_notes.com
+$ file = "sys$disk:[.vms]build_''project'_release_notes.com"
+$ if f$search(file) .nes. ""
+$ then
+$   @'file'
+$ else
+$   @[.vms]build_project_release_notes.com
+$ endif
 $!
 $!
 $! Make sure that the source has been backed up.
 $!----------------------------------------------
-$ @[.vms]backup_make_src.com
+$ @[.vms]backup_'project'_src.com
 $!
 $! Regenerate the PCSI description file.
 $!--------------------------------------
-$ @[.vms]build_make_pcsi_desc.com
+$ file = "sys$disk:[.vms]build_''project'_pcsi_desc.com"
+$ if f$search(file) .nes. ""
+$ then
+$   @'file'
+$ else
+$   @[.vms]build_project_pcsi_desc.com
+$ endif
 $!
 $! Regenerate the PCSI Text file.
 $!---------------------------------
-$ @[.vms]build_make_pcsi_text.com
+$ file = "sys$disk:[.vms]build_''project'_pcsi_text.com"
+$ if f$search(file) .nes. ""
+$ then
+$   @'file'
+$ else
+$   @[.vms]build_project_pcsi_text.com
+$ endif
 $!
 $!
 $! Parse the kit name into components.
@@ -94,7 +113,8 @@ $!---------------------------------------
 $ kit_name = f$trnlnm("GNV_PCSI_KITNAME")
 $ if kit_name .eqs. ""
 $ then
-$   write sys$output "@[.vms]make_pcsi_make_kit_name.com has not been run."
+$   write sys$output -
+	 "@[.vms]make_pcsi_''project'_kit_name.com has not been run."
 $   goto all_exit
 $ endif
 $ producer = f$element(0, "-", kit_name)
@@ -163,16 +183,9 @@ $!
 $! VAX can not do a compressed kit.
 $! ZIP -9 "-V" does a better job, so no reason to normally build a compressed
 $! kit.
-$!----------------------------------
-$if p1 .eqs. "COMPRESSED"
+$if f$type(zip) .eqs. "STRING"
 $then
-$   if arch_code .nes. "V"
-$   then
-$       product copy /options=(novalidate, noconfirm) /format=compressed -
-        'product_name' -
-        /source=stage_root:[kit]/dest=stage_root:[kit] -
-        /version='version'/base='base'
-$   endif
+$   zip "-9Vj" stage_root:[kit]'kit_name'.zip stage_root:[kit]'kit_name'.pcsi
 $endif
 $!
 $all_exit:

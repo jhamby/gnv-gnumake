@@ -34,7 +34,7 @@ $!   create/dir new_gnu:[lib]/prot=o:rwed
 $   create/dir new_gnu:[usr.bin]/prot=o:rwed
 $   create/dir new_gnu:[usr.share.doc.make]/prot=o:rwed
 $   create/dir new_gnu:[usr.share.info]/prot=o:rwed
-$   create/dir new_gnu:[usr.share.doc.man.man1]/prot=o:rwed
+$   create/dir new_gnu:[usr.share.man.man1]/prot=o:rwed
 $ endif
 $!
 $ if mode .eqs. "install"
