@@ -1,6 +1,6 @@
 From file: make_release_note_start.com
 
-This is the GNV 3.0.1 fork of GNU Make 3.78.1 with a minor bug-fix.
+This is the GNV 3.0.1 fork of GNU Make 3.78.1 with minor bug-fixes.
 
 Future work on GNV make is planned to be done by merging these changes
 with the GNU Make upstream so that one image can be used that will use
@@ -159,6 +159,23 @@ The GNV make program is designed to be installed in the GNV$GNU directory tree.
 
 Fixes and enhancements:
 
+** Version 3.78.1 ECO 1
+
+*  The sys$login:make*. are attempted to be clean up.
+   https://sourceforge.net/p/gnv/bugs/31/
+
+*  Images are now found with the PATH environment varable not the
+   VAXC$PATH logical name.
+   https://sourceforge.net/p/gnv/bugs/104/
+
+*  If the GNV_VMS_FOREIGN environment variable is set to 1, Make will
+   look for VMS foreign commands if the image is not found in the PATH
+   environment variable.
+   When looking up the foreign command symbol, any characters that are
+   not alphanumeric will be replaced with a underscore.
+   Example for "python3.5", the DCL symbol "python3_5" will be used.
+   The foreign command must specify the complete path for the filename.
+
 ** Version 3.78.1 - Initial Separate Kit
 
 *  Makefile.vms files are now ignored.  Makefile.vms files use a unique
@@ -180,13 +197,10 @@ Fixes and enhancements:
 
 Issues not fixed:
 
-*  sys$login:make* files may be left behind.
-   https://sourceforge.net/p/gnv/bugs/31/
+*  Make no longer uses the vaxc$path logical name.
 
-*  This fork of GNU Make uses the vaxc$path logical name to find the images
-   to run for recipes.
    If the logical name vaxc$path is not defined, it will be defined internally
-   with the list of:
+   for use in child processes with the list of:
 
    GNV$GNU:[usr.local.bin]
    GNV$GNU:[usr.local.sbin]
@@ -194,10 +208,6 @@ Issues not fixed:
    GNV$GNU:[bin]
    GNV$GNU:[sbin]
    SYS$DISK:[].
-
-   Future versions of GNU make are planned to use the PATH environment
-   variable inherited from Bash, when run from Bash.
-
 
 The supplied GNV$MAKE_STARTUP.COM procedure is provided in
 [VMS$COMMON.SYS$STARTUP] can be put in your VMS startup procedure to make

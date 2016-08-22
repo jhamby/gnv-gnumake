@@ -6,7 +6,8 @@ $!
 $! In case of problems with the install you might contact me at
 $! zinser@decus.decus.de (preferred) or martin_zinser@exchange.de
 $!
-$! 7-Jul-2015	J. Malmberg - Fix to build with search lists.
+$!  7-Jul-2015	J. Malmberg - Fix to build with search lists.
+$! 16-Aug-2016  J. Malmberg - Fix execvp() and deleting /tmp/make* files.
 $!
 $! Look for the compiler used
 $!
@@ -52,8 +53,8 @@ $ cc sys$disk:vms_crtl_init.c
 $
 $ filelist1 = "ar arscan commands default dir expand file function"
 $ filelist2 = " implicit job main misc read remake remote-stub rule signame"
-$ filelist3 = " variable version vmsfunctions vmsify vpath"
-$ filelist4 = " [.glob]fnmatch getopt1 getopt"
+$ filelist3 = " variable version vmsfunctions vmsify vpath vms_execvp_hack"
+$ filelist4 = " vms_get_foreign_cmd [.glob]fnmatch getopt1 getopt"
 $ filelist = filelist1 + filelist2 + filelist3 + filelist4
 $ arch_name = f$edit(f$getsyi("arch_name"),"lowercase,trim")
 $ ! should be based on version, not arch.

@@ -68,6 +68,7 @@ static int amiga_batch_file;
 # include <processes.h>
 # include <starlet.h>
 # include <lib$routines.h>
+int vms_execvp (const char *file_name, char * argv[]);
 #endif
 
 #ifdef WINDOWS32
@@ -425,6 +426,9 @@ reap_children (block, err)
 #endif
 		pid = wait (&status);
 #if defined(VMS)
+              /* Hack, shell script does not always clean up */
+              if (c->vms_tmp_file[0] != 0)
+                unlink(c->vms_tmp_file);
 	    } /* !unixy_shell */
 #endif /* !VMS */
 	    }
@@ -1630,9 +1634,10 @@ int vmsHandleChildTerm(struct child *child)
 
 #define MAXCMDLEN 200
 
-int vms_bash_execvp(prog,argv)
+int vms_bash_execvp(prog,argv,child)
      char *prog;
      char **argv;
+     struct child *child;
 {
     static int make_print_exec = -1;
     int pid;
@@ -1652,6 +1657,7 @@ int vms_bash_execvp(prog,argv)
 /*
  *  Handle case where long line is going to bash
  */
+    child->vms_tmp_file[0]=0;
     if ((strcmp(argv[0],&default_shell[0])==0) &&
 	(strcmp(argv[1],"-c")==0) &&
 	(strlen(argv[2])>255)) {
@@ -1670,10 +1676,12 @@ int vms_bash_execvp(prog,argv)
       f=fdopen(temp_handle,"w");
       if (f==NULL) { perror("fopen"); exit(1); }
 
+      fgetname(f, child->vms_tmp_file, 0);
+
       fprintf(f,"%s\n",argv[2]);
       /* Make script cleanup after itself */
       fprintf(f,"ret=$?\n");
-      fprintf(f,"rm -f $0\n");
+      fprintf(f,"rm -f $0\n"); /* Does not always work */
       fprintf(f,"exit $ret\n");
       fclose(f);
 
@@ -1692,7 +1700,7 @@ int vms_bash_execvp(prog,argv)
       }
       if (pid == 0) {
 	/* child */
-	execvp (new_argv[0], new_argv);
+	vms_execvp (new_argv[0], new_argv);
 	perror_with_name ("execvp(long): ", new_argv[0]);
 	return -1;
       }
@@ -1726,8 +1734,7 @@ int vms_bash_execvp(prog,argv)
       }
       if (pid == 0) {
 	/* child */
-	execvp(argv[0], argv);
-
+	vms_execvp(argv[0], argv);
 	/*
 	** If we failed with ENOEXEC, then try again using the shell. This
 	** is the way execvp works on UNIX, but on OpenVMS we have to hack it.
@@ -1748,9 +1755,8 @@ int vms_bash_execvp(prog,argv)
 		--argc;
 	    }
 
-	    return vms_bash_execvp (new_argv[0], new_argv);
+	    return vms_bash_execvp (new_argv[0], new_argv, child);
 	}
-
 	/* some other error back from execvp */
 	perror_with_name ("execvp: ", argv[0]);
       }
@@ -1770,7 +1776,7 @@ child_execute_job (argv, child)
 if (unixy_shell) {
   char **my_environ = environ;
   environ = child->environment;
-  child->pid = vms_bash_execvp(argv[0],argv);
+  child->pid = vms_bash_execvp(argv[0],argv,child);
   environ = my_environ;
   if (child->pid < 0)
     return 0;
