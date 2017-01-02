@@ -159,6 +159,12 @@ The GNV make program is designed to be installed in the GNV$GNU directory tree.
 
 Fixes and enhancements:
 
+** Version 3.78.1 ECO 2
+
+*  Fixed an access violations caused by VMS code assuming a pointer was always
+   valid.
+   https://sourceforge.net/p/gnv/bugs/118/
+
 ** Version 3.78.1 ECO 1
 
 *  The sys$login:make*. are attempted to be clean up.

@@ -416,7 +416,11 @@ reap_children (block, err)
 #if defined(VMS)
 	    if (!unixy_shell) {
 	      vmsWaitForChildren (&status);
-	      pid = c->pid;
+              if (c != NULL) {
+	        pid = c->pid;
+              } else {
+                pid = 0;
+              }
 	    } else {
 #endif /* !VMS */
 #ifdef WAIT_NOHANG
@@ -427,7 +431,7 @@ reap_children (block, err)
 		pid = wait (&status);
 #if defined(VMS)
               /* Hack, shell script does not always clean up */
-              if (c->vms_tmp_file[0] != 0)
+              if ((c != NULL) && (c->vms_tmp_file[0] != 0))
                 unlink(c->vms_tmp_file);
 	    } /* !unixy_shell */
 #endif /* !VMS */
