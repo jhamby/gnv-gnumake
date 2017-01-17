@@ -39,7 +39,7 @@ Boston, MA 02111-1307, USA.  */
 # include <lib$routines.h>
 extern int decc$pipe(int __array_fdscptr[2], ...);
 extern int decc$set_child_standard_streams(int,int,int);
-extern int vms_bash_execvp(char *prog, char **argv);
+extern int vms_bash_execvp(char *prog, char **argv, struct child *child);
 #endif
 
 struct function_table_entry
@@ -1431,7 +1431,7 @@ func_shell (o, argv, funcname)
 
 #ifdef VMS
     decc$set_child_standard_streams(nullfd,pipedes[1],0);
-    pid = vms_bash_execvp (command_argv[0],command_argv);
+    pid = vms_bash_execvp (command_argv[0],command_argv, NULL);
     decc$set_child_standard_streams(-1, -1, -1);
     if (pid < 0) {
       perror_with_name (error_prefix, "forkexec");

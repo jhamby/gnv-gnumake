@@ -161,8 +161,8 @@ Fixes and enhancements:
 
 ** Version 3.78.1 ECO 2
 
-*  Fixed an access violations caused by VMS code assuming a pointer was always
-   valid.
+*  Fixed muliple access violation issues in the code to clean up temporary
+   files from ECO 1.
    https://sourceforge.net/p/gnv/bugs/118/
 
 ** Version 3.78.1 ECO 1

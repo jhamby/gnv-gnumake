@@ -1659,10 +1659,9 @@ int vms_bash_execvp(prog,argv,child)
       argv[0]=&default_shell[0];
 
 /*
- *  Handle case where long line is going to bash
+ *  Handle case where long line is going to bash.
  */
-    child->vms_tmp_file[0]=0;
-    if ((strcmp(argv[0],&default_shell[0])==0) &&
+    if ((child != NULL) && (strcmp(argv[0],&default_shell[0])==0) &&
 	(strcmp(argv[1],"-c")==0) &&
 	(strlen(argv[2])>255)) {
       int temp_handle;
@@ -1670,6 +1669,7 @@ int vms_bash_execvp(prog,argv,child)
       FILE *f;
       char *new_argv[3];
 
+      child->vms_tmp_file[0]=0;
       if (gnv_debug_make)
 	printf("writing long argument to file: %s\n",argv[2]);
 
@@ -1721,11 +1721,11 @@ int vms_bash_execvp(prog,argv,child)
   	  printf(" %s",*p);
 	if (strlen(*p)>255) {
 	  p=argv;
-	  while (*p!=NULL) {
-	    perror_with_name ("execv 2: ", *p);
-	    p++;
-	  }
-	  exit(127);
+	while (*p!=NULL) {
+	  perror_with_name ("execv 2: ", *p);
+	  p++;
+	}
+	exit(127);
 	}
 	p++;
       }
@@ -1759,7 +1759,7 @@ int vms_bash_execvp(prog,argv,child)
 		--argc;
 	    }
 
-	    return vms_bash_execvp (new_argv[0], new_argv, child);
+	    return vms_execvp (new_argv[0], new_argv);
 	}
 	/* some other error back from execvp */
 	perror_with_name ("execvp: ", argv[0]);
