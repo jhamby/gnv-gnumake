@@ -133,6 +133,7 @@ $ updatepatch = f$element(4, "-", kit_name)
 $ if updatepatch .eqs. "" then updatepatch = ""
 $!
 $ version_fao = "!AS.!AS"
+$ if arch_name .eqs. "VAX" then version_fao = "!AS$5n!AS"
 $ mmversion = f$fao(version_fao, "''majorver'", "''minorver'")
 $ if updatepatch .nes. ""
 $ then
